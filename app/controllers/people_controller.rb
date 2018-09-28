@@ -1,24 +1,28 @@
 class PeopleController < ApplicationController
+  layout 'people'
+
   def index
   	@msg = 'Person data'
   	@data = Person.all
   end
 
+  def add
+    @msg = "add new data."
+    @person = Person.new
+  end
+
   def show
-  	@msg = "Indexed data"
+  	@msg = "Indexed data."
   	@data = Person.find(params[:id])
   end
 
-  def add
-  	@msg = "add new data."
-  	@person = Person.new
-  end
-
   def create
-  	if request.post? then
-  		Person.create(person_params)
-  	end
-  	redirect_to '/people'
+  	@person = Person.new person_params
+    if @person.save then
+        redirect_to '/people'
+    else
+      render 'add'
+    end
   end
 
   def edit
@@ -36,6 +40,15 @@ class PeopleController < ApplicationController
   	obj = Person.find(params[:id])
   	obj.destroy
   	redirect_to '/people'
+  end
+
+  def find
+    @msg = 'please type search word...'
+    @people = Array.new
+    if request.post? then
+        f = params{:find}.split ','
+        @people = Person.where "age >= ? and age <= ?", f[0],f[1]
+    end
   end
 
 
